@@ -1,11 +1,16 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UsersModule } from './users/users.module';
+import { CatsModule } from './cats/cats.module';
+import { LoggerMiddleware } from './cats/middleware/logger.middleware';
 
 @Module({
-  imports: [UsersModule],
+  imports: [CatsModule],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes('cats'); // cats uri에 들어오는 모든 요청들은 로그 찍히게 함
+  }
+}
