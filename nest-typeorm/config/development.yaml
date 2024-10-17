@@ -1,0 +1,9 @@
+#synchronize : true, 개발 환경에서는 entity 칼럼값이 추가되거나 등 db가 바뀌면 이에 맞춰서 추가해줌
+db:
+  host: 'localhost'
+  username: 'postgres'
+  password: 'postgres'
+  synchronize: true
+
+jwt:
+  secret: 'secret'

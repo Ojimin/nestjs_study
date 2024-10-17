@@ -1,0 +1,10 @@
+server:
+  port: 3000
+
+db:
+  type: 'postgres'
+  port: 5432
+  database: 'boardapp'
+
+jwt:
+  expiresIn: 3600 #1시간 후에 토큰 만료

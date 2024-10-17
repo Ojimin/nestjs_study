@@ -4,6 +4,7 @@ import { CreateBoardDto } from './dto/create-board.dto';
 import { BoardRepository } from './board.repository';
 import { Board } from './board.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { User } from 'src/auth/user.entity';
 
 @Injectable()
 export class BoardsService {
@@ -11,8 +12,11 @@ export class BoardsService {
     @InjectRepository(BoardRepository)
     private readonly boardRepository: BoardRepository,
   ) {}
-  async getAllBoards(): Promise<Board[]> {
-    return this.boardRepository.find();
+  async getAllBoards(user: User): Promise<Board[]> {
+    const query = this.boardRepository.createQueryBuilder('board');
+    query.where('board.userId =  :userId', { userId: user.id });
+    const boards = await query.getMany();
+    return boards;
   }
   //   getAllBoards(): Board[] {
   //     return this.boards;
@@ -28,8 +32,8 @@ export class BoardsService {
   //     this.boards.push(board); // 게시물 넣기
   //     return board;
   //   }
-  createBoard(createBoardDto: CreateBoardDto): Promise<Board> {
-    return this.boardRepository.createBoard(createBoardDto);
+  createBoard(createBoardDto: CreateBoardDto, user: User): Promise<Board> {
+    return this.boardRepository.createBoard(createBoardDto, user);
   }
 
   async getBoardById(id: number): Promise<Board> {
@@ -50,13 +54,14 @@ export class BoardsService {
   //     return found;
   //   }
 
-  async deleteBoard(id: number): Promise<void> {
-    const result = await this.boardRepository.delete(id);
+  async deleteBoard(id: number, user: User): Promise<void> {
+    const result = await this.boardRepository.delete({ id, user });
     // console.log('result', result);
     // 삭제가 안됬음을 체크하고 에러 던지기
     if (result.affected === 0) {
       throw new NotFoundException(`Can't find Board with id ${id}`);
     }
+    //404 에러 : not found, 403: forbidden(권한 없음)
   }
 
   //   deleteBoard(id: string): void {
